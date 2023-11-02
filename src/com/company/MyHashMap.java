@@ -42,25 +42,41 @@ public class MyHashMap<N,T> {
         return map.length == 0;
     }
 
-    public void put(N key, T value) {
+    public void put(N key, T value) { // replaces value if key is present in index
+        boolean absent = true;
         int index = calculateIndex(key);
         Node node = new Node(key, value);
-        map[index].add(node);
+        for (Node x : map[index]) {
+            if (x.getKey().equals(key)) {
+                x.setValue(value);
+                absent = false;
+            }
+        }
+        if (absent) {
+            map[index].add(node);
+        }
         if (map[index].size() == 1) {
             numFilled++;
         }
         if (numFilled > loadFactor * capacity) {
             capacity*=2;
+            LinkedList[] arr = new LinkedList[capacity];
+            for (int i = 0; i < arr.length; i++) {
+                LinkedList<Node> newLinked = new LinkedList<>();
+                arr[i] = newLinked;
+            }
             for (LinkedList<Node> nodes : map) {
                 for (Node j : nodes) {
                     N k = j.getKey();
                     T v = j.getValue();
                     index = calculateIndex(k);
-                    LinkedList<Node>[] arr = new LinkedList[capacity];
                     Node tempNode = new Node(k, v);
-                    map[index].add(tempNode);
+                    System.out.println(k);
+                    arr[index].add(tempNode);
                 }
             }
+
+            map = arr;
         }
     }
 
@@ -68,10 +84,13 @@ public class MyHashMap<N,T> {
     public T putIfAbsent(N key, T value) {
         int index = calculateIndex(key);
         for (Node j : map[index]) {
-            if (j.getValue().equals(value));
-                return value;
+            if (j.getValue().equals(value)) {
+                return null;
+            }
         }
-        return null;
+        Node node = new Node(key,value);
+        map[index].add(node);
+        return value;
     }
 
     public Node remove(Object key, Object value) { //Returns the item being removed
@@ -152,9 +171,18 @@ public class MyHashMap<N,T> {
     }
 
     public void display() { //Output entire HashMap. Should indicate which bucket each element belongs to and, if multiple per bucket, starts at head and goes to tail.
+        int idx = 0;
         for (LinkedList<Node> nodes : map) {
+            System.out.print("Index: " + idx + ": ");
+            idx++;
+            if (nodes.isEmpty()) {
+                System.out.print("[]");
+            }
             for (Node j : nodes) {
-                System.out.print("[" + j.getKey() + ", " + j.getValue() + "], ");
+                if (! j.equals(nodes.getFirst())) {
+                    System.out.print(", ");
+                }
+                System.out.print("[" + j.getKey() + ", " + j.getValue() + "]");
             }
             System.out.println();
         }
@@ -162,7 +190,7 @@ public class MyHashMap<N,T> {
     }
 
     public int calculateIndex(Object key) {
-        return key.hashCode() & map.length - 1;
+        return key.hashCode() & capacity - 1;
     }
 
 
