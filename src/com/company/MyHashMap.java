@@ -75,7 +75,6 @@ public class MyHashMap<N,T> {
                     arr[index].add(tempNode);
                 }
             }
-
             map = arr;
         }
     }
@@ -88,10 +87,10 @@ public class MyHashMap<N,T> {
                 return null;
             }
         }
-        Node node = new Node(key,value);
-        map[index].add(node);
+        put(key, value);
         return value;
     }
+
 
     public Node remove(Object key, Object value) { //Returns the item being removed
         for (LinkedList<Node> nodes : map) {
@@ -131,7 +130,7 @@ public class MyHashMap<N,T> {
         int index = calculateIndex(key);
         for (Node node : map[index]) {
             if (node.getKey().equals(key)) {
-                return node;
+                return node.getKey();
             }
         }
         return null;
@@ -141,7 +140,7 @@ public class MyHashMap<N,T> {
         int index = calculateIndex(key);
         for (Node node : map[index]) {
             if (node.getKey().equals(key)) {
-                return value;
+                return node.getValue();
             }
         }
         return value;
